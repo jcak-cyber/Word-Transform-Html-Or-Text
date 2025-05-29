@@ -1,0 +1,14 @@
+.file-box{
+    height: 194px;
+    background-color: #fafafc;
+    overflow-y: auto;
+    .list{
+        padding: 10px 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        &:hover{
+            background-color: #f3f3f5;
+        }
+    }
+}

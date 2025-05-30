@@ -1,10 +1,13 @@
 {
-  "name": "pp-plguin",
+  "name": "Word-Transform-Html-Or-Text",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "build": "vue-tsc -b && vite build"
+    "dev": "vite",
+    "build": "node --no-warnings ./scripts/build.js",
+    "original-build": "vue-tsc && vite build",
+    "serve": "vite preview"
   },
   "dependencies": {
     "mammoth": "^1.9.1",
@@ -17,8 +20,11 @@
     "@vitejs/plugin-vue": "^5.2.3",
     "@vitejs/plugin-vue-jsx": "^4.2.0",
     "@vue/tsconfig": "^0.7.0",
+    "archiver": "^7.0.1",
     "chrome-types": "^0.1.352",
+    "inquirer": "^12.6.3",
     "naive-ui": "^2.41.0",
+    "ora": "^8.2.0",
     "rollup-plugin-copy": "^3.5.0",
     "sass-embedded": "^1.89.0",
     "typescript": "~5.8.3",

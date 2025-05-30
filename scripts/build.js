@@ -1,8 +1,8 @@
 import { spawn } from 'child_process';
-import ora from 'ora';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import { join } from 'path';
+import ora from 'ora';
 import fs from "fs";
 import inquirer from "inquirer";
 import createZip from './createZip.js';

@@ -1,6 +1,6 @@
 <template>
   <div class="file-box">
-    <div class="list" v-for="(item, index) in fileList" :key="item.id">
+    <div class="list" v-for="(item, index) in localFileList" :key="item.id">
       <div class="name">{{ index + 1 }}.{{ item.name }}</div>
       <view class="btn">
         <n-button
@@ -9,7 +9,7 @@
           size="small"
           @click="handleCopyContent(item)"
         >
-          复制
+          复制{{ copyFileType === "1"?'HTML':"文本" }}
         </n-button>
       </view>
     </div>
@@ -17,57 +17,31 @@
 </template>
 
 <script setup lang="ts">
-import { type UploadFileInfo, NButton } from "naive-ui";
-import { ref, onMounted, onUnmounted } from "vue";
+import { type UploadFileInfo, NButton, useMessage } from "naive-ui";
 import mammoth from "mammoth";
 import { fileToArrayBuffer } from "../../../utils";
+import { useFileStore } from "../../../stores";
+import { storeToRefs } from "pinia";
 
-const fileList = ref<UploadFileInfo[]>([]);
+const message = useMessage();
+const fileStore = useFileStore();
+const { localFileList, copyFileType } = storeToRefs(fileStore);
 
 const handleCopyContent = async (item: UploadFileInfo) => {
-  console.log(item.file);
-  
   if (!item || !item.file) return;
   const buffer = await fileToArrayBuffer(item.file);
-  const content =  mammoth.convertToHtml({ arrayBuffer: buffer });
-  console.log(content);
+
+  const funcMap = {
+    "0": mammoth.extractRawText,
+    "1": mammoth.convertToHtml,
+  } as Record<string, (input: { arrayBuffer: ArrayBuffer }) => Promise<{ value?: string }>>;
+
+  const content = await funcMap[copyFileType.value]({ arrayBuffer: buffer });
+  if (!content.value) return;
+
+  message.success("复制成功");
+  navigator.clipboard.writeText(content.value);
 };
-
-// 更安全的存储操作
-const getFileList = async () => {
-  try {
-    const result = await chrome.storage.local.get(["fileList"]);
-    if (result.fileList) {
-      fileList.value = result.fileList;
-    }
-  } catch (error) {
-    console.error("Failed to get fileList:", error);
-  }
-};
-
-const handleLocChange = (
-  changes: Record<string, chrome.storage.StorageChange>,
-  areaName: string
-) => {
-  if (areaName === "local" && changes.fileList) {
-    fileList.value = changes.fileList.newValue as UploadFileInfo[];
-  }
-};
-
-onMounted(() => {
-  if (chrome?.storage) {
-    getFileList();
-    chrome.storage.onChanged.addListener(handleLocChange);
-  } else {
-    console.warn("chrome.storage API is not available");
-  }
-});
-
-onUnmounted(() => {
-  if (chrome?.storage) {
-    chrome.storage.onChanged.removeListener(handleLocChange);
-  }
-});
 </script>
 
 <style lang="scss" scoped>

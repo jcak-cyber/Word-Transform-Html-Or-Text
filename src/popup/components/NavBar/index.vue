@@ -1,27 +1,29 @@
 <template>
   <div class="nav-container">
-    <n-switch
-      v-model="modelValue"
-      checked-value="1"
-      unchecked-value="0"
-      @update:value="handleUpdateValue"
-    >
-      <template #checked> HTML </template>
-      <template #unchecked> TEXT </template>
-    </n-switch>
+    <div class="switch-box">
+      <div class="label">解析类型：</div>
+      <n-switch
+        :default-value="fileStore.copyFileType"
+        checked-value="1"
+        unchecked-value="0"
+        @update:value="handleUpdateValue"
+      >
+        <template #checked> HTML </template>
+        <template #unchecked> TEXT </template>
+      </n-switch>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { NSwitch } from "naive-ui";
+import { useFileStore } from "../../../stores";
 
-defineProps<{ modelValue: string}>();
-const emits = defineEmits(["update:modelValue"]);
+const fileStore = useFileStore();
 
 const handleUpdateValue = (value: string) => {
-  emits("update:modelValue", value);
+  fileStore.setCopyFileType(value as "1" | "0");
 };
-
 </script>
 
 <style lang="scss" scoped>

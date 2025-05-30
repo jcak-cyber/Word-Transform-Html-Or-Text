@@ -1,7 +1,7 @@
 # 忽略 node_modules 目录
 node_modules/
-
 # 其他常见忽略项（推荐添加）
+extensions/
 .env
 .DS_Store
 dist/

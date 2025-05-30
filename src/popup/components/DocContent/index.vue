@@ -1,6 +1,6 @@
 <template>
   <div class="doc-upload">
-    <nav-bar v-model:model-value="switchValue" />
+    <nav-bar/>
     <n-tabs class="custom-tabs" type="segment" animated v-model="tabValue">
       <n-tab-pane
         v-for="item in tabList"
@@ -21,7 +21,6 @@ import FileList from "../FileList/index.vue";
 import DragUpload from "../DragUpload/index.vue";
 import { ref } from "vue";
 
-const switchValue = ref<string>("1");
 const tabValue = ref<string>("upload");
 
 const tabList = ref([

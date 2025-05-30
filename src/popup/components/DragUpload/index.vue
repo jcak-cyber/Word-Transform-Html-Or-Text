@@ -4,7 +4,6 @@
     directory-dnd
     @before-upload="beforeUpload"
     :show-file-list="false"
-    v-model:file-list="fileList"
     @update-file-list="handleUpdateFileList"
   >
     <n-upload-dragger>
@@ -22,7 +21,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
 import {
   NUpload,
   NUploadDragger,
@@ -35,6 +33,8 @@ import {
 import { ArchiveOutline as ArchiveIcon } from "@vicons/ionicons5";
 import { sleep } from "../../../utils";
 import { showLoading, hideLoading } from "../../../hooks/useLoading";
+import { useFileStore } from "../../../stores";
+import { storeToRefs } from "pinia";
 
 const allowedFileType = [
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
@@ -42,7 +42,8 @@ const allowedFileType = [
 ];
 
 const message = useMessage();
-const fileList = ref<UploadFileInfo[]>([]);
+const fileStore = useFileStore();
+const { localFileList } = storeToRefs(fileStore);
 
 const beforeUpload = async (data: {
   file: UploadFileInfo;
@@ -54,10 +55,9 @@ const beforeUpload = async (data: {
     message.error("只能上传doc或docx格式的文件！");
     return false;
   }
-  const result = await chrome.storage.local.get(["fileList"]);
 
-  if (result.fileList && result.fileList.length) {
-    const existFileIndex = (result.fileList as UploadFileInfo[]).findIndex(
+  if (localFileList.value && localFileList.value.length) {
+    const existFileIndex = (localFileList.value as UploadFileInfo[]).findIndex(
       (item) => item.name === data.file.name
     );
     if (existFileIndex !== -1) {
@@ -73,8 +73,7 @@ const handleUpdateFileList = async (files: UploadFileInfo[]) => {
   await sleep(1500);
   hideLoading();
   message.success("文件上传成功！");
-  
-  chrome.storage.local.set({ fileList: files });
+  fileStore.setLocalFileList([...localFileList.value, ...files]);
 };
 </script>
 

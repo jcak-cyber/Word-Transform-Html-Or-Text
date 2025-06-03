@@ -1,19 +1,15 @@
-// const init = () => {
-//   const addIframe = (id: string, pagePath: string) => {
-//     const contentIframe = document.createElement("iframe");
-//     contentIframe.id = id;
-//     contentIframe.style.cssText = "width: 100%; height: 100%; position: fixed; inset: 0px; margin: 0px auto; z-index: 10000002; border: none;";
-//     const getContentPage = chrome.runtime.getURL(pagePath);
-//     console.log("getContentPage",getContentPage);
-    
-//     contentIframe.src = getContentPage;
-//     document.body.appendChild(contentIframe);
-//   }
+import { insertContent } from "../contentPage/main";
+const init = ():HTMLDivElement => {
+  const divEl = document.createElement("div");
+  divEl.id = "extensions-content";
+  divEl.style.width = "100%";
+  insertContent(divEl.id);
 
-//   addIframe('content-start-iframe', 'contentPage/index.html')
-// }
+  return divEl;
+};
 
-// content页面注入
-// if (window.top === window.self) {
-//   init();
-// }
+// content注入
+if (window.top === window.self) {
+  const el = init();
+  document.body.appendChild(el);
+}

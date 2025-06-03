@@ -1,6 +1,6 @@
 <template>
   <div class="file-box">
-    <div class="list" v-for="(item, index) in localFileList" :key="item.id">
+    <div class="list" v-for="(item, index) in dbFileList" :key="item.id">
       <div class="name">{{ index + 1 }}.{{ item.name }}</div>
       <view class="btn">
         <n-button
@@ -9,7 +9,16 @@
           size="small"
           @click="handleCopyContent(item)"
         >
-          复制{{ copyFileType === "1"?'HTML':"文本" }}
+          复制{{ copyFileType === "1" ? "HTML" : "文本" }}
+        </n-button>
+
+        <n-button
+          quaternary
+          type="error"
+          size="small"
+          @click="handleDelete(item)"
+        >
+          删除
         </n-button>
       </view>
     </div>
@@ -22,10 +31,14 @@ import mammoth from "mammoth";
 import { fileToArrayBuffer } from "../../../utils";
 import { useFileStore } from "../../../stores";
 import { storeToRefs } from "pinia";
+import db from "../../../utils/db";
+import { ref } from "vue";
 
 const message = useMessage();
 const fileStore = useFileStore();
-const { localFileList, copyFileType } = storeToRefs(fileStore);
+const { copyFileType } = storeToRefs(fileStore);
+
+const dbFileList = ref<UploadFileInfo[]>([]);
 
 const handleCopyContent = async (item: UploadFileInfo) => {
   if (!item || !item.file) return;
@@ -34,7 +47,10 @@ const handleCopyContent = async (item: UploadFileInfo) => {
   const funcMap = {
     "0": mammoth.extractRawText,
     "1": mammoth.convertToHtml,
-  } as Record<string, (input: { arrayBuffer: ArrayBuffer }) => Promise<{ value?: string }>>;
+  } as Record<
+    string,
+    (input: { arrayBuffer: ArrayBuffer }) => Promise<{ value?: string }>
+  >;
 
   const content = await funcMap[copyFileType.value]({ arrayBuffer: buffer });
   if (!content.value) return;
@@ -42,6 +58,28 @@ const handleCopyContent = async (item: UploadFileInfo) => {
   message.success("复制成功");
   navigator.clipboard.writeText(content.value);
 };
+
+const handleDelete = async (item: UploadFileInfo) => {
+  try {
+    await db.delete(item.name);
+    message.success("删除成功!");
+    getFileList();
+  } catch (error) {
+    message.success("删除失败!");
+    console.log(error);
+  }
+}
+
+const getFileList = async () => {
+  try {
+    const result = await db.getAllDataViaCursor<UploadFileInfo>();
+    dbFileList.value = result;
+  } catch (error) {
+    console.log("getFileList===>", error);
+  }
+};
+
+getFileList();
 </script>
 
 <style lang="scss" scoped>

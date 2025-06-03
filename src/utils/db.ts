@@ -33,8 +33,8 @@ class IndexedDBHelper implements DBConfig {
             keyPath: this.keyPath,
             autoIncrement: true,
           });
-          // 创建索引（示例）
-          store.createIndex("id", "id", { unique: true });
+          // 创建索引
+          store.createIndex("name", "name", { unique: true });
         }
       };
 
@@ -57,6 +57,7 @@ class IndexedDBHelper implements DBConfig {
 
       const request = store.add(item);
       request.onsuccess = () => resolve();
+
       request.onerror = reject;
     });
   }
@@ -69,7 +70,29 @@ class IndexedDBHelper implements DBConfig {
 
       const request = store.get(key);
       request.onsuccess = () => resolve(request.result);
+
       request.onerror = reject;
+    });
+  }
+
+  // 获取所有数据(游标方式)
+  public async getAllDataViaCursor<T>():Promise<T[]> {
+    return new Promise((resolve, reject) => {
+      const transaction = this.db!.transaction(this.storeName, "readonly");
+      const store = transaction.objectStore(this.storeName);
+      const request = store.openCursor(); // 打开游标
+      const allData:T[] = [];
+
+      request.onsuccess = (event) => {
+        const cursor = (event.target as IDBRequest)?.result;
+        if (cursor) {
+          allData.push(cursor.value); // 当前数据存入数组
+          cursor.continue(); // 继续下一项
+        } else {
+          resolve(allData as T[]);
+        }
+      };
+      request.onerror = (event) => reject((event.target as IDBRequest).error);
     });
   }
 
@@ -80,7 +103,9 @@ class IndexedDBHelper implements DBConfig {
       const store = transaction.objectStore(this.storeName);
 
       const request = store.put(item);
-      request.onsuccess = () => resolve();
+      request.onsuccess = () => {
+        resolve();
+      };
       request.onerror = reject;
     });
   }
@@ -103,4 +128,5 @@ export default new IndexedDBHelper({
   name: "myDatabase",
   version: 1,
   storeName: "fileListStore",
+  keyPath: "name",
 });

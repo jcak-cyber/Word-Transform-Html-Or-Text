@@ -33,8 +33,7 @@ import {
 import { ArchiveOutline as ArchiveIcon } from "@vicons/ionicons5";
 import { sleep } from "../../../utils";
 import { showLoading, hideLoading } from "../../../hooks/useLoading";
-import { useFileStore } from "../../../stores";
-import { storeToRefs } from "pinia";
+import db from "../../../utils/db";
 
 const allowedFileType = [
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
@@ -42,8 +41,6 @@ const allowedFileType = [
 ];
 
 const message = useMessage();
-const fileStore = useFileStore();
-const { localFileList } = storeToRefs(fileStore);
 
 const beforeUpload = async (data: {
   file: UploadFileInfo;
@@ -56,15 +53,13 @@ const beforeUpload = async (data: {
     return false;
   }
 
-  if (localFileList.value && localFileList.value.length) {
-    const existFileIndex = (localFileList.value as UploadFileInfo[]).findIndex(
-      (item) => item.name === data.file.name
-    );
-    if (existFileIndex !== -1) {
-      message.error("该文件已存在！");
-      return false;
-    }
+  const request = await db.get(data.file.name);
+  
+  if(request){
+    message.error("该文件已存在！");
+    return false
   }
+
   showLoading("文件上传中");
   return true;
 };
@@ -73,7 +68,7 @@ const handleUpdateFileList = async (files: UploadFileInfo[]) => {
   await sleep(1500);
   hideLoading();
   message.success("文件上传成功！");
-  fileStore.setLocalFileList([...localFileList.value, ...files]);
+  db.add(files[0]);
 };
 </script>
 

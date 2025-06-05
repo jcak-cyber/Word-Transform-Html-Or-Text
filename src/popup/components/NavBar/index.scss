@@ -2,8 +2,14 @@
     width: 100%;
     box-sizing: border-box;
     margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     .switch-box{
         display: flex;
         align-items: center;
+    }
+    .setting{
+        cursor: pointer;
     }
 }

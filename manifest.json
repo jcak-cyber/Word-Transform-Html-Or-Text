@@ -19,6 +19,10 @@
     "service_worker": "background/service-worker.js",
     "type": "module"
   },
+  "options_ui": {
+    "page": "options/index.html",
+    "open_in_tab": false
+  },
   "permissions": ["storage"],
   "host_permissions": [],
   "content_scripts": [

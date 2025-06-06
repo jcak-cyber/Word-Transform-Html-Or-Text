@@ -8,7 +8,7 @@
         unchecked-value="0"
         @update:value="handleUpdateValue"
       >
-        <template #checked> HTML </template>
+        <template #checked> TEMP </template>
         <template #unchecked> TEXT </template>
       </n-switch>
     </div>
@@ -33,6 +33,7 @@ const handleUpdateValue = (value: string) => {
 };
 
 const handleGoOptions = () => {
+  // 进入选项页面
   if (chrome.runtime.openOptionsPage) {
     chrome.runtime.openOptionsPage();
   } else {

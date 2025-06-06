@@ -61,10 +61,10 @@ function build() {
 }
 
 async function start() {
-  const distExist = fs.existsSync(join(rootDir,distName))
+  const distExist = fs.existsSync(join(rootDir, distName))
 
   if (distExist) {
-    const choices = ['压缩文件', '重新打包', '退出'];
+    const choices = ['重新打包', '压缩文件', '退出'];
     const answer = await inquirer.prompt([
       {
         type: 'list',

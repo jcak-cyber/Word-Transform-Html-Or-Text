@@ -1,0 +1,24 @@
+.setting {
+  width: 100%;
+  height: 520px;
+  display: flex;
+  flex-direction: column;
+  .setting__header {
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    .btn-group {
+      margin-left: 40px;
+    }
+  }
+  .setting__body {
+    flex: 1;
+    :deep(.codeflask) {
+      position: relative !important;
+      .codeflask__lines{
+        background-color: #eeeeee;
+        z-index: 4;
+      }
+    }
+  }
+}

@@ -9,7 +9,7 @@
           size="small"
           @click="handleCopyContent(item)"
         >
-          复制{{ copyFileType === "1" ? "HTML" : "文本" }}
+          复制{{ copyFileType === "1" ? "模板" : "文本" }}
         </n-button>
 
         <n-button
@@ -55,8 +55,21 @@ const handleCopyContent = async (item: UploadFileInfo) => {
   const content = await funcMap[copyFileType.value]({ arrayBuffer: buffer });
   if (!content.value) return;
 
-  message.success("复制成功");
-  navigator.clipboard.writeText(content.value);
+  // 只有非文本结构才会使用模板
+  if (copyFileType.value === "1") {
+    const copyTemp = await chrome.storage.local.get(["temp"]);
+    const reg = /\{\{\s*template\s*\}\}/g;
+    content.value = copyTemp.temp
+      ? (copyTemp.temp as string).replace(reg, content.value)
+      : content.value;
+  }
+
+  try {
+    navigator.clipboard.writeText(content.value);
+    message.success("复制成功");
+  } catch (error) {
+    message.error("复制失败");
+  }
 };
 
 const handleDelete = async (item: UploadFileInfo) => {
@@ -68,7 +81,7 @@ const handleDelete = async (item: UploadFileInfo) => {
     message.success("删除失败!");
     console.log(error);
   }
-}
+};
 
 const getFileList = async () => {
   try {
